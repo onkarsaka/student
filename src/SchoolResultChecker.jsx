@@ -289,11 +289,11 @@ export default function SchoolResultChecker() {
         }
     };
 
-    let isShiftAEnabled = false;
+    let isShiftEnabled = false;
 
     document.addEventListener('keydown', (event) => {
-        if (event.shiftKey && (event.key === 'a' || event.key === 'A')) {
-            isShiftAEnabled = true;
+        if (event.shiftKey ) {
+            isShiftEnabled = true;
         }
 
         if (event.key === 'Enter') {
@@ -307,7 +307,7 @@ export default function SchoolResultChecker() {
 
     document.addEventListener('keyup', (event) => {
         if (event.key === 'a' || event.key === 'A') {
-            isShiftAEnabled = false;
+            isShiftEnabled = false;
         }
     });
 
@@ -315,7 +315,7 @@ export default function SchoolResultChecker() {
 
     headers.forEach(header => {
         header.addEventListener('click', (event) => {
-            if (isShiftAEnabled) {
+            if (isShiftEnabled) {
                 header.setAttribute('contenteditable', 'true');
                 header.focus();
             }
@@ -331,7 +331,7 @@ export default function SchoolResultChecker() {
             <section className='header-hero'>
                 <img src={schoollogo} alt="" />
                 <div>
-                    <h1>कै.आ.ह.आब्बा प्राथमिक विद्यालय सोलापूर</h1>
+                    <h1>कै.आ.ह. आब्बा प्राथमिक विद्यालय सोलापूर</h1>
                     <h3>94/41, जोडभावी पेठ सोलापूर</h3>
                 </div>
             </section>
@@ -339,7 +339,7 @@ export default function SchoolResultChecker() {
             <div className="school-result-checker" id="resultsTable">
                 <div className='school-informations'>
                     <div className='school-informations-section1'>
-                        <h3 id='school-name'>शाळेचे नांव : <span className="editable-header" contenteditable="false">कै.आ.ह.आब्बा प्राथमिक विद्यालय सोलापूर</span></h3>
+                        <h3 id='school-name'>शाळेचे नांव : <span className="editable-header" contenteditable="false">कै.आ.ह. आब्बा प्राथमिक विद्यालय सोलापूर</span></h3>
                         <h3 id='teacher-name'>वर्ग शिक्षकाचे नांव : <span className="editable-header" contenteditable="false">शिक्षकांचे नाव</span></h3>
                     </div>
                     <div className='school-informations-section2'>

@@ -9,28 +9,28 @@ header {
 
 .header-hero {
     display: flex;
-    padding: 0 2rem;
+    padding: 0 5rem;
     padding-right: 0;
     background-color: white;
     margin-bottom: 50px;
+    align-items: center;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    gap: 25px;
 }
 
 .header-hero img {
     padding: 25px;
-    width: 250px;
-    height: 200px;
+    width: 120px;
+    height: 110px;
 }
 
 .header-hero div {
-    padding: 1.5rem;
-    padding-right: 0;
     height: auto;
     color: black;
 }
 
 .header-hero div h1 {
-    font-size: 2.5rem;
+    font-size: 2rem;
     color: black;
     margin-bottom: 0;
 }
@@ -263,6 +263,8 @@ footer a {
     .school-result-checker {
         padding: 10px;
         min-height: 600px;
+        min-width: none;
+        margin: 0 1rem;
     }
 
     h1 {
@@ -277,16 +279,20 @@ footer a {
         width: 90%;
     }
 
-    .input-section button,
-    .export-section button {
+    .input-section button {
         width: 100%;
         margin-top: 10px;
     }
 
     .export-section {
-        flex-direction: column;
-        margin-top: 100px;
+        flex-wrap: wrap;
+        margin-top: 10px;
         gap: 10px;
+    }
+
+    .export-section button{
+        width: 50%;
+        margin-top: 10px;
     }
 
     th,
