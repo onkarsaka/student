@@ -152,6 +152,11 @@ td {
     background-color: #0000;
 }
 
+.datainput:focus{
+    background-color: rgba(193, 255, 193, 0.4);
+    color: black;
+}
+
 th {
     background-color: #f2f2f2;
     font-weight: bold;
@@ -220,7 +225,7 @@ footer h3 {
 
 footer a {
     text-decoration: none;
-    color: #4CAF50;
+    color: white;
 }
 
 @media (max-width: 768px) {

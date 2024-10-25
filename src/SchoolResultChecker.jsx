@@ -4,6 +4,7 @@ import * as XLSX from 'xlsx';
 import html2canvas from 'html2canvas';
 import './SchoolResultChecker.css';
 import schoollogo from "./schoollogo.jpg"
+import { click } from '@testing-library/user-event/dist/click';
 
 export default function SchoolResultChecker() {
     const [students, setStudents] = useState([]);
@@ -183,7 +184,7 @@ export default function SchoolResultChecker() {
 
     const exportToExcel = () => {
         const wsData = [];
-    
+
         const schoolName = [document.getElementById('school-name').innerText];
         const teacherName = [document.getElementById('teacher-name').innerText];
         const schoolYear = [document.getElementById('school-year').innerText];
@@ -191,7 +192,7 @@ export default function SchoolResultChecker() {
         const schoolSection = [document.getElementById('school-section').innerText];
         const schoolPaperHeader = [document.getElementById('school-paper-header').innerText];
         const schoolSemester = [document.getElementById('school-semester').innerText];
-    
+
         wsData.push(schoolName);
         wsData.push(teacherName);
         wsData.push(schoolYear);
@@ -202,36 +203,36 @@ export default function SchoolResultChecker() {
         wsData.push('');
 
         const mergeRanges = [
-            { s: { r: 0, c: 0 }, e: { r: 0, c: 2 } }, 
+            { s: { r: 0, c: 0 }, e: { r: 0, c: 0 } },
             { s: { r: 1, c: 0 }, e: { r: 1, c: 0 } },
-            { s: { r: 2, c: 0 }, e: { r: 2, c: 0 } }, 
-            { s: { r: 3, c: 0 }, e: { r: 3, c: 0 } }, 
-            { s: { r: 4, c: 0 }, e: { r: 4, c: 0 } }, 
-            { s: { r: 5, c: 0 }, e: { r: 5, c: 0 } }, 
-            { s: { r: 6, c: 0 }, e: { r: 6, c: 0 } }, 
+            { s: { r: 2, c: 0 }, e: { r: 2, c: 0 } },
+            { s: { r: 3, c: 0 }, e: { r: 3, c: 0 } },
+            { s: { r: 4, c: 0 }, e: { r: 4, c: 0 } },
+            { s: { r: 5, c: 0 }, e: { r: 5, c: 0 } },
+            { s: { r: 6, c: 0 }, e: { r: 6, c: 0 } },
         ];
-    
+
         const headerRow1 = ['विद्यार्थ्यांचे नाव'];
         subjects.forEach((subject, index) => {
-            headerRow1.push(subject, '', '', ''); 
+            headerRow1.push(subject, '', '', '');
             const colStart = 1 + index * 4;
             const colEnd = colStart + 3;
             mergeRanges.push({ s: { r: 8, c: colStart }, e: { r: 8, c: colEnd } });
         });
-    
+
         headerRow1.push('एकूण गुण', 'शेकडा प्रमाण', 'श्रेणी', 'श्रेणीवर्णन', 'शेरा');
         wsData.push(headerRow1);
-    
+
         const headerRow2 = [''];
         subjects.forEach(() => {
             headerRow2.push('आकारीक मुल्य', 'संकलित मुल्य', 'एकूण', 'श्रेणी');
         });
         headerRow2.push(' ', ' ', ' ');
         wsData.push(headerRow2);
-    
+
         data.forEach((student) => {
             const row = [student.name];
-    
+
             subjects.forEach((subject) => {
                 const theory = student[`${subject}Theory`] || '';
                 const practical = student[`${subject}Practical`] || '';
@@ -239,7 +240,7 @@ export default function SchoolResultChecker() {
                 const grade = calculateGrade(total) || 'NaN';
                 row.push(theory, practical, total, grade);
             });
-    
+
             row.push(
                 student.overallTotal || '',
                 (student.overallTotal / subjects.length).toFixed(2) || '',
@@ -249,11 +250,11 @@ export default function SchoolResultChecker() {
             );
             wsData.push(row);
         });
-    
+
         const ws = XLSX.utils.aoa_to_sheet(wsData);
-    
+
         ws['!merges'] = mergeRanges;
-    
+
         mergeRanges.forEach((range) => {
             for (let r = range.s.r; r <= range.e.r; r++) {
                 for (let c = range.s.c; c <= range.e.c; c++) {
@@ -263,36 +264,55 @@ export default function SchoolResultChecker() {
                 }
             }
         });
-    
-        const maxColWidths = wsData[0].map((_, colIndex) =>
-            Math.max(...wsData.map((row) => (row[colIndex] ? row[colIndex].toString().length : 0)))
+
+        const maxColWidths = wsData[9].map((_, colIndex) =>
+            Math.max(...wsData.map((row) => (row[colIndex] ? row[colIndex].toString().length : 4)))
         );
-    
+
         ws['!cols'] = maxColWidths.map((width) => ({ width: width + 2 }));
-    
+
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, 'Results');
-    
+
         XLSX.writeFile(wb, 'school_results.xlsx');
     };
-    
 
-    const exportToImage = () => {
-        const table = document.getElementById('resultsTable');
-        if (table) {
-            html2canvas(table).then(canvas => {
-                const link = document.createElement('a');
-                link.download = 'school_results.png';
-                link.href = canvas.toDataURL();
-                link.click();
-            });
+
+    const exportToImage = async () => {
+        const elements = ['resultInfo', 'school-paper-header', 'school-semester', 'resultsTable',];
+
+        const tempContainer = document.createElement('div');
+        tempContainer.style.position = 'absolute';
+        tempContainer.style.top = '-9999px';
+
+        elements.forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                const clonedElement = element.cloneNode(true);
+                tempContainer.appendChild(clonedElement);
+            }
+        });
+
+        document.body.appendChild(tempContainer);
+
+        try {
+            const canvas = await html2canvas(tempContainer);
+
+            const link = document.createElement('a');
+            link.download = 'school_results.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        } catch (err) {
+            console.error('Error capturing elements:', err);
+        } finally {
+            document.body.removeChild(tempContainer);
         }
     };
 
     let isShiftEnabled = false;
 
     document.addEventListener('keydown', (event) => {
-        if (event.shiftKey ) {
+        if (event.shiftKey) {
             isShiftEnabled = true;
         }
 
@@ -306,7 +326,7 @@ export default function SchoolResultChecker() {
     });
 
     document.addEventListener('keyup', (event) => {
-        if (event.key === 'a' || event.key === 'A') {
+        if (click) {
             isShiftEnabled = false;
         }
     });
@@ -336,8 +356,8 @@ export default function SchoolResultChecker() {
                 </div>
             </section>
 
-            <div className="school-result-checker" id="resultsTable">
-                <div className='school-informations'>
+            <div className="school-result-checker" >
+                <div className='school-informations' id="resultInfo">
                     <div className='school-informations-section1'>
                         <h3 id='school-name'>शाळेचे नांव : <span className="editable-header" contenteditable="false">कै.आ.ह. आब्बा प्राथमिक विद्यालय सोलापूर</span></h3>
                         <h3 id='teacher-name'>वर्ग शिक्षकाचे नांव : <span className="editable-header" contenteditable="false">शिक्षकांचे नाव</span></h3>
@@ -368,7 +388,7 @@ export default function SchoolResultChecker() {
                     <button onClick={addSubjects}>विषय ॲड करा</button>
                     <button onClick={removeSubjects}>विषय रिमूव करा</button>
                 </div>
-                <div className="table-container">
+                <div className="table-container" id="resultsTable">
                     <table {...getTableProps()}>
                         <thead>
                             {headerGroups.map((headerGroup, i) => (
@@ -392,6 +412,7 @@ export default function SchoolResultChecker() {
                                                     <input className={`datainput ${cell.column.id == 'name' ? "nameinput" : ""}`}
                                                         value={cell.value || ''}
                                                         onChange={(e) => handleCellEdit(row.original.id, cell.column.id, e.target.value)}
+                                                        placeholder='Enter Marks here'
                                                         onBlur={(e) => {
                                                             if (cell.column.id.includes('Theory')) {
                                                                 handleCellEdit(row.original.id, cell.column.id, Math.min(Number(e.target.value), 100).toString());
@@ -417,7 +438,7 @@ export default function SchoolResultChecker() {
                 <button onClick={exportToImage}>Export to Image</button>
             </div>
             <footer>
-                <h3>Designed and developed by <a href="https://github.com/akhil-8605">Akhilesh</a></h3>
+                <h3>Developed by  <a href="https://vishwalatarati.in/">Vishwalatarati Digital Solutions Private Limited</a></h3>
             </footer>
         </main>
     );
