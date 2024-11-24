@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo ,useEffect} from 'react';
 import { useTable } from 'react-table';
 import * as XLSX from 'xlsx';
 import html2canvas from 'html2canvas';
@@ -7,6 +7,37 @@ import schoollogo from "./schoollogo.jpg"
 import { click } from '@testing-library/user-event/dist/click';
 
 export default function SchoolResultChecker() {
+
+    useEffect(() => {
+        // Condition 1: Warn on page reload
+        const handleBeforeUnload = (event) => {
+          event.preventDefault();
+          event.returnValue = "If you reload, you may lose your data...";
+        };
+    
+        window.addEventListener('beforeunload', handleBeforeUnload);
+    
+        // Condition 2: Check for slow internet connection
+        const checkInternetSpeed = () => {
+          const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+          if (connection && connection.effectiveType) {
+            // Adjust "slow" threshold based on your requirement
+            const slowConnections = ['slow-2g', '2g', '3g'];
+            if (slowConnections.includes(connection.effectiveType)) {
+              alert("Your internet is too slow; you may lose data if you continue.");
+            }
+          }
+        };
+    
+        // Run once on mount
+        checkInternetSpeed();
+    
+        // Cleanup event listener on unmount
+        return () => {
+          window.removeEventListener('beforeunload', handleBeforeUnload);
+        };
+      }, []);
+    
     const [students, setStudents] = useState([]);
     const [newStudent, setNewStudent] = useState({ name: '' });
     const [subjects, setSubjects] = useState(['विषय १']);
